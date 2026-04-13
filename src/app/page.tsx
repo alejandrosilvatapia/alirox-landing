@@ -163,13 +163,13 @@ export default function LandingPage() {
             >
               Iniciar sesión
             </a>
-            <Link
-              href="/registro"
+            <a
+              href="https://app.aliroxclinic.cl/registro"
               className="text-sm px-4 py-2 rounded-lg font-bold transition-colors hover:opacity-90"
               style={{ background: '#00d4a0', color: '#04342C' }}
             >
               Prueba gratis
-            </Link>
+            </a>
           </div>
         </div>
       </nav>
@@ -194,13 +194,13 @@ export default function LandingPage() {
 
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row gap-3 justify-center mb-5">
-          <Link
-            href="/registro"
+          <a
+            href="https://app.aliroxclinic.cl/registro"
             className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-bold text-base transition-colors hover:opacity-90"
             style={{ background: '#00d4a0', color: '#04342C' }}
           >
             Prueba gratis — 30 días <ArrowRight size={16} />
-          </Link>
+          </a>
           <a
             href="#demo-sec"
             className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-base border-2 border-white/30 text-white hover:border-white/60 transition-colors"
@@ -654,13 +654,13 @@ export default function LandingPage() {
                   Siguiente →
                 </button>
               ) : (
-                <Link
-                  href="/registro"
+                <a
+                  href="https://app.aliroxclinic.cl/registro"
                   className="px-5 py-2.5 rounded-xl text-sm font-bold transition-all hover:opacity-90"
                   style={{ background: '#00d4a0', color: '#04342C' }}
                 >
                   Empezar gratis →
-                </Link>
+                </a>
               )}
             </div>
           </div>
@@ -751,8 +751,8 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <Link
-                href={`/registro?plan=${p.slug}`}
+              <a
+                href={`https://app.aliroxclinic.cl/registro?plan=${p.slug}`}
                 className="block w-full py-2.5 rounded-xl text-sm font-semibold text-center transition-all hover:opacity-90"
                 style={
                   p.popular
@@ -761,7 +761,7 @@ export default function LandingPage() {
                 }
               >
                 Empezar gratis
-              </Link>
+              </a>
             </div>
           ))}
         </div>
@@ -856,13 +856,13 @@ export default function LandingPage() {
           <p className="text-gray-400 max-w-xl mx-auto mb-8 leading-relaxed">
             Únete a más de 500 dentistas en Chile que ya confían en Alirox. Empieza gratis hoy — sin tarjeta de crédito, sin complicaciones.
           </p>
-          <Link
-            href="/registro"
+          <a
+            href="https://app.aliroxclinic.cl/registro"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-base font-bold transition-all hover:opacity-90"
             style={{ background: '#00d4a0', color: '#04342C' }}
           >
             Empieza gratis hoy <ArrowRight size={18} />
-          </Link>
+          </a>
           <p className="text-xs text-gray-600 mt-5">
             30 días gratis · Sin tarjeta de crédito · Cancela cuando quieras
           </p>
