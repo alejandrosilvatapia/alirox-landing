@@ -42,40 +42,60 @@ const DEMO_STEPS = [
   },
 ]
 
+type BillingPeriod = 'monthly' | 'semiannual' | 'annual'
+
 const PLANS = [
   {
-    slug: 'basic',
+    id: 'basico',
     name: 'Básico',
-    price: 19990,
-    dentists: 'Hasta 2 dentistas',
+    prices: { monthly: 19990, semiannual: 99950, annual: 199900 },
+    dentists: '1 dentista',
     popular: false,
-    features: ['Agenda inteligente', 'Fichas de pacientes', 'Recordatorios automáticos', 'Soporte por email', 'Hasta 500 pacientes'],
+    features: ['Agenda inteligente', 'Fichas de pacientes', 'Presupuestos y pagos', 'Recordatorios email', 'Pacientes ilimitados', 'Soporte por email'],
+    highlightedFeatures: [],
   },
   {
-    slug: 'pro',
+    id: 'pro',
     name: 'Pro',
-    price: 39990,
-    dentists: 'Hasta 10 dentistas',
+    prices: { monthly: 39990, semiannual: 199950, annual: 399900 },
+    dentists: 'Hasta 5 dentistas',
     popular: false,
-    features: ['Todo Básico incluido', 'Facturación y cobranzas', 'Reportes avanzados', 'Campañas de marketing', 'Soporte prioritario'],
+    features: ['Todo Básico incluido', 'Facturación electrónica', 'Reportes avanzados', 'Comisiones dentistas', 'Gastos operacionales', 'Soporte prioritario'],
+    highlightedFeatures: [],
   },
   {
-    slug: 'pro_ia',
+    id: 'proia',
     name: 'Pro + IA',
-    price: 59990,
-    dentists: 'Hasta 20 dentistas',
+    prices: { monthly: 59990, semiannual: 299950, annual: 599900 },
+    dentists: 'Hasta 10 dentistas',
     popular: true,
-    features: ['Todo Pro incluido', 'Agente omnicanal 24/7', 'WhatsApp Business API', 'Instagram + Facebook', 'Motor de ventas IA'],
+    features: ['Todo Pro incluido', 'Agente IA 24/7', '500 WhatsApp/mes', 'Campañas de marketing', 'Instagram + Facebook', 'Motor de ventas IA'],
+    highlightedFeatures: ['Agente IA 24/7', '500 WhatsApp/mes'],
   },
   {
-    slug: 'enterprise',
+    id: 'enterprise',
     name: 'Enterprise',
-    price: 99990,
+    prices: { monthly: 99990, semiannual: 499950, annual: 999900 },
     dentists: 'Dentistas ilimitados',
     popular: false,
-    features: ['Todo Pro + IA', 'Sucursales ilimitadas', 'API acceso completo', 'Soporte dedicado 24/7', 'SLA 99.9% garantizado'],
+    features: ['Todo Pro + IA', 'Sucursales ilimitadas', '1.000 WhatsApp/mes', 'API FHIR R4 completa', 'Soporte dedicado 24/7', 'SLA 99.9% garantizado'],
+    highlightedFeatures: [],
   },
 ]
+
+function getMonthlyEquivalent(plan: typeof PLANS[0], period: BillingPeriod) {
+  if (period === 'monthly') return plan.prices.monthly
+  if (period === 'semiannual') return Math.round(plan.prices.semiannual / 6)
+  return Math.round(plan.prices.annual / 12)
+}
+
+function getSavingsText(plan: typeof PLANS[0], period: BillingPeriod) {
+  if (period === 'monthly') return null
+  const freeMonths = period === 'semiannual' ? 1 : 2
+  const totalPrice = period === 'semiannual' ? plan.prices.semiannual : plan.prices.annual
+  const periodLabel = period === 'semiannual' ? 'semestre' : 'año'
+  return `${freeMonths} ${freeMonths === 1 ? 'mes gratis' : 'meses gratis'} · Pagas $${formatCLP(totalPrice)}/${periodLabel}`
+}
 
 const TESTIMONIALS = [
   {
@@ -140,6 +160,7 @@ function formatCLP(n: number) {
 export default function LandingPage() {
   const [demoStep, setDemoStep] = useState(0)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('semiannual')
 
   return (
     <div className="min-h-screen bg-[#0a0c0f] text-white">
@@ -199,7 +220,7 @@ export default function LandingPage() {
             className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-bold text-base transition-colors hover:opacity-90"
             style={{ background: '#00d4a0', color: '#04342C' }}
           >
-            Prueba gratis — 30 días <ArrowRight size={16} />
+            Prueba gratis — 15 días <ArrowRight size={16} />
           </a>
           <a
             href="#demo-sec"
@@ -711,60 +732,127 @@ export default function LandingPage() {
 
       {/* ── 7. PRECIOS ── */}
       <section id="precios" className="max-w-6xl mx-auto px-4 py-16">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: '#00d4a0' }}>Precios</p>
           <h2 className="text-3xl md:text-4xl font-bold mb-3">Simple y transparente</h2>
-          <p className="text-gray-400">30 días gratis en todos los planes. Sin tarjeta de crédito.</p>
+          <p className="text-gray-400"><span style={{ color: '#00d4a0' }}>15 días gratis</span> en todos los planes. Sin tarjeta de crédito.</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {PLANS.map(p => (
-            <div
-              key={p.slug}
-              className="relative rounded-2xl p-5 flex flex-col"
-              style={{
-                background: '#111318',
-                border: p.popular ? '2px solid #00d4a0' : '1px solid rgba(255,255,255,0.10)',
-                boxShadow: p.popular ? '0 0 30px rgba(0,212,160,0.1)' : 'none',
-              }}
-            >
-              {p.popular && (
-                <div
-                  className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap"
-                  style={{ background: '#00d4a0', color: '#04342C' }}
-                >
-                  Más popular
-                </div>
-              )}
-              <div className="mb-5">
-                <p className="font-bold text-white text-base">{p.name}</p>
-                <div className="flex items-baseline gap-1 mt-2">
-                  <span className="text-2xl font-bold text-white">${formatCLP(p.price)}</span>
-                  <span className="text-gray-500 text-sm">/mes</span>
-                </div>
-                <p className="text-xs text-gray-500 mt-1">{p.dentists}</p>
-              </div>
-              <ul className="space-y-2 flex-1 mb-5">
-                {p.features.map(f => (
-                  <li key={f} className="flex items-start gap-2 text-sm">
-                    <Check size={13} className="shrink-0 mt-0.5" style={{ color: '#00d4a0' }} />
-                    <span className="text-gray-300">{f}</span>
-                  </li>
-                ))}
-              </ul>
-              <a
-                href={`https://app.aliroxclinic.cl/registro?plan=${p.slug}`}
-                className="block w-full py-2.5 rounded-xl text-sm font-semibold text-center transition-all hover:opacity-90"
+
+        {/* Toggle de período */}
+        <div className="flex justify-center mb-10">
+          <div className="inline-flex p-1 rounded-xl gap-1" style={{ background: 'rgba(255,255,255,0.06)' }}>
+            {[
+              { value: 'monthly' as BillingPeriod, label: 'Mensual' },
+              { value: 'semiannual' as BillingPeriod, label: 'Semestral', badge: '-17%' },
+              { value: 'annual' as BillingPeriod, label: 'Anual', badge: '-17%' },
+            ].map((option) => (
+              <button
+                key={option.value}
+                onClick={() => setBillingPeriod(option.value)}
+                className="px-5 py-2.5 rounded-lg text-sm font-medium transition-all"
                 style={
-                  p.popular
-                    ? { background: '#00d4a0', color: '#04342C', fontWeight: 700 }
-                    : { background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.30)', color: '#ffffff' }
+                  billingPeriod === option.value
+                    ? { background: 'rgba(255,255,255,0.1)', color: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }
+                    : { background: 'transparent', color: '#9ca3af' }
                 }
               >
-                Empezar gratis
-              </a>
-            </div>
-          ))}
+                {option.label}
+                {option.badge && (
+                  <span
+                    className="ml-2 px-2 py-0.5 rounded text-xs text-white"
+                    style={{ background: option.value === 'annual' ? '#00a77d' : '#00d4a0' }}
+                  >
+                    {option.badge}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
+
+        {/* Cards de planes */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {PLANS.map(p => {
+            const monthlyEquivalent = getMonthlyEquivalent(p, billingPeriod)
+            const savingsText = getSavingsText(p, billingPeriod)
+            const showStrikethrough = billingPeriod !== 'monthly'
+
+            return (
+              <div
+                key={p.id}
+                className="relative rounded-2xl p-5 flex flex-col"
+                style={{
+                  background: p.popular
+                    ? 'linear-gradient(135deg, rgba(0,212,160,0.08), rgba(0,167,125,0.03))'
+                    : '#111318',
+                  border: p.popular ? '2px solid #00d4a0' : '1px solid rgba(255,255,255,0.10)',
+                  boxShadow: p.popular ? '0 0 30px rgba(0,212,160,0.1)' : 'none',
+                }}
+              >
+                {p.popular && (
+                  <div
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap"
+                    style={{ background: '#00d4a0', color: '#04342C' }}
+                  >
+                    MÁS POPULAR
+                  </div>
+                )}
+
+                <div className="mb-5">
+                  <p className="font-bold text-base" style={{ color: p.popular ? '#00d4a0' : '#ffffff' }}>{p.name}</p>
+
+                  <div className="mt-2">
+                    {showStrikethrough && (
+                      <div className="text-sm text-gray-500 line-through">
+                        ${formatCLP(p.prices.monthly)}
+                      </div>
+                    )}
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-2xl font-bold text-white">${formatCLP(monthlyEquivalent)}</span>
+                      <span className="text-gray-500 text-sm">/mes</span>
+                    </div>
+                  </div>
+
+                  {savingsText && (
+                    <p className="text-xs mt-1" style={{ color: '#00d4a0' }}>{savingsText}</p>
+                  )}
+
+                  <p className="text-xs text-gray-500 mt-2">{p.dentists}</p>
+                </div>
+
+                <ul className="space-y-2 flex-1 mb-5">
+                  {p.features.map(f => (
+                    <li key={f} className="flex items-start gap-2 text-sm">
+                      <Check size={13} className="shrink-0 mt-0.5" style={{ color: '#00d4a0' }} />
+                      <span
+                        className={p.highlightedFeatures.includes(f) ? 'font-medium' : ''}
+                        style={{ color: p.highlightedFeatures.includes(f) ? '#00d4a0' : '#d1d5db' }}
+                      >
+                        {f}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                <a
+                  href={`https://app.aliroxclinic.cl/registro?plan=${p.id}&period=${billingPeriod}`}
+                  className="block w-full py-2.5 rounded-xl text-sm font-semibold text-center transition-all hover:opacity-90"
+                  style={
+                    p.popular
+                      ? { background: '#00d4a0', color: '#04342C', fontWeight: 700 }
+                      : { background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.30)', color: '#ffffff' }
+                  }
+                >
+                  Empezar gratis
+                </a>
+              </div>
+            )
+          })}
+        </div>
+
+        <p className="text-center text-xs text-gray-600 mt-8">
+          Todos los precios en CLP. IVA no incluido.
+        </p>
       </section>
 
       {/* ── 8. TESTIMONIOS ── */}
@@ -864,7 +952,7 @@ export default function LandingPage() {
             Empieza gratis hoy <ArrowRight size={18} />
           </a>
           <p className="text-xs text-gray-600 mt-5">
-            30 días gratis · Sin tarjeta de crédito · Cancela cuando quieras
+            15 días gratis · Sin tarjeta de crédito · Cancela cuando quieras
           </p>
         </div>
       </section>
