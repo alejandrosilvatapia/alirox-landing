@@ -999,9 +999,14 @@ export default function LandingPage() {
             <div>
               <p className="text-white font-semibold text-sm mb-4">Legal</p>
               <ul className="space-y-2.5">
-                {['Privacidad', 'Términos de uso', 'Cookies', 'Cumplimiento GDPR'].map(l => (
-                  <li key={l}>
-                    <a href="#" className="text-gray-500 text-sm hover:text-white transition-colors">{l}</a>
+                {[
+                  { label: 'Privacidad', href: '/privacidad' },
+                  { label: 'Términos de uso', href: '/terminos' },
+                  { label: 'Cookies', href: '/privacidad' },
+                  { label: 'Cumplimiento GDPR', href: '/privacidad' },
+                ].map(({ label, href }) => (
+                  <li key={label}>
+                    <a href={href} className="text-gray-500 text-sm hover:text-white transition-colors">{label}</a>
                   </li>
                 ))}
               </ul>
